@@ -51,6 +51,15 @@ def conv(Input, Filter):
     
     return convolved
 
+def max_pool(matrice, k_size):
+    k_x, k_y = k_size
+    m_x, m_y = matrice.shape
+    mk = m_x // k_x
+    my = m_y // k_y
+
+    return matrice[:mk * k_x, :my * k_y].reshape(mk, k_x, my,
+                                               k_y).max(axis=(1, 3))
+
 np_array = Image_Processing("Numbers.png", output=True)
 
 horizontal = np.array([
