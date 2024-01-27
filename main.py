@@ -62,18 +62,24 @@ def max_pool(matrice, k_size):
 
 np_array = Image_Processing("Numbers.png", output=True)
 
-horizontal = np.array([
-                      [1, 1, 1], 
-                      [0, 0, 0], 
-                      [-1, -1, -1]])
-a = conv(np_array, horizontal)
-data = Image.fromarray(a).convert("L")
+horizontal = np.array([[1, 1, 1], [0, 0, 0], [-1, -1, -1]])
+vertical = np.array([[-1, 0, 1], [-1, 0, 1], [-1, 0, 1]])
+
+h = conv(np_array, horizontal)
+v = conv(np_array, vertical)
+
+data = Image.fromarray(h).convert("L")
 data.save("./img_h.png")
 
-vertical = np.array([
-                      [-1, 0, 1], 
-                      [-1, 0, 1], 
-                      [-1, 0, 1]])
-a = conv(np_array, vertical)
-data = Image.fromarray(a).convert("L")
+data = Image.fromarray(v).convert("L")
 data.save("./img_v.png")
+
+#Pooling arrays
+k_size = (2, 2)
+h_p = max_pool(h, k_size)
+v_p = max_pool(v, k_size)
+
+data = Image.fromarray(h_p).convert("L")
+data.save("./img_h_p.png")
+data = Image.fromarray(v_p).convert("L")
+data.save("./img_v_p.png")
