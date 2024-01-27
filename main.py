@@ -2,63 +2,77 @@ from PIL import Image, ImageOps
 import sys
 import numpy as np
 from tqdm import tqdm
+import threading
 
 #numpy.set_printoptions(threshold=sys.maxsize)
 
-def Image_Processing(file: str, output=False):
+
+class Image_Processing(threading.Thread):
+
+  def __init__(self, file: str, output=False):
+    threading.Thread.__init__(self)
+    self.file = file
+    self.output = output
+    # set a default value
+    self.ret = []
+
+  def run(self):
     # Open image
-    img = Image.open(f"./Images/{file}")
+    img = Image.open(f"./Images/{self.file}")
     # Convert in Black and White
     img = ImageOps.invert(img.convert('L'))
     # Convert into NumPy array
     np_d = np.array(img)
 
-    if output:
-        # Create an output image
-        data = Image.fromarray(np_d)
-        # Save it
-        data.save(f"./Outputs/{file}")
+    if self.output:
+      # Create an output image
+      data = Image.fromarray(np_d)
+      # Save it
+      data.save(f"./Outputs/{self.file}")
 
-        # Reshape the array in 1D
-        #np_d_flat = np_d.reshape(-1)
-        np_d_flat = np.reshape(np_d, (1, np_d.size))
+      # Reshape the array in 1D
+      #np_d_flat = np_d.reshape(-1)
+      np_d_flat = np.reshape(np_d, (1, np_d.size))
 
-        # Create an output image
-        data = Image.fromarray(np_d_flat)
-        # Save it
-        data.save(f"./Outputs/flat_{file}")
+      # Create an output image
+      data = Image.fromarray(np_d_flat)
+      # Save it
+      data.save(f"./Outputs/flat_{self.file}")
 
-        # Save the NumPy array in .npy file
-        #np.save("./Outputs/output.npy", np_d)
+      # Save the NumPy array in .npy file
+      #np.save("./Outputs/output.npy", np_d)
 
-    return np_d
+    self.ret = np_d
+
 
 def conv(Input, Filter):
-    filter_size = Filter.shape[0]
+  filter_size = Filter.shape[0]
 
-    #  creating an array to store convolutions (x-m+1, y-n+1)
-    convolved = np.zeros(((Input.shape[0] - filter_size) + 1, 
-                      (Input.shape[1] - filter_size) + 1))
-    
-    #  performing convolution
-    for i in tqdm(range(Input.shape[0])):
-      for j in range(Input.shape[1]):
-        try:
-          convolved[i,j] = (Input[i:(i+filter_size),
-                                  j:(j+filter_size)] * Filter).sum()
-        except Exception:
-          pass
-    
-    return convolved
+  #  creating an array to store convolutions (x-m+1, y-n+1)
+  convolved = np.zeros(
+      ((Input.shape[0] - filter_size) + 1, (Input.shape[1] - filter_size) + 1))
+
+  #  performing convolution
+  for i in tqdm(range(Input.shape[0])):
+    for j in range(Input.shape[1]):
+      try:
+        convolved[i, j] = (Input[i:(i + filter_size), j:(j + filter_size)] *
+                           Filter).sum()
+      except Exception:
+        pass
+
+  return convolved
+
 
 def max_pool(matrice, k_size):
-    k_x, k_y = k_size
-    m_x, m_y = matrice.shape
-    mk = m_x // k_x
-    my = m_y // k_y
+  k_x, k_y = k_size
+  m_x, m_y = matrice.shape
+  mk = m_x // k_x
+  my = m_y // k_y
 
-    return matrice[:mk * k_x, :my * k_y].reshape(mk, k_x, my,
+  return matrice[:mk * k_x, :my * k_y].reshape(mk, k_x, my,
                                                k_y).max(axis=(1, 3))
+
 
 np_array = Image_Processing("Numbers.png", output=True)
 
