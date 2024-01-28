@@ -90,7 +90,7 @@ def Process(file: str, output=True):
   return (h_p, v_p)
 
 def start_processing(img_l, output=True):
-  pool = Pool(10)
+  pool = Pool(len(img_l))
   results = [pool.apply_async(Process, (img, output)) for img in img_l]
   pool.close()
   pool.join()
