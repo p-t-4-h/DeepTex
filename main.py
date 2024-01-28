@@ -80,6 +80,8 @@ def Process(file: str, output=True):
   h_p = max_pool(h, k_size)
   v_p = max_pool(v, k_size)
 
+  f_arr = np.mean(np.array([h_p, v_p]), axis=0)
+
   if output:
     data = Image.fromarray(h).convert("L")
     data.save(f"./Outputs/h_{file}")
@@ -89,8 +91,10 @@ def Process(file: str, output=True):
     data.save(f"./Outputs/h_p_{file}")
     data = Image.fromarray(v_p).convert("L")
     data.save(f"./Outputs/v_p_{file}")
+    data = Image.fromarray(f_arr).convert("L")
+    data.save(f"./Outputs/f_arr_{file}")
 
-  return (h_p, v_p)
+  return f_arr
 
 def start_processing(img_l, output=True):
   pool = Pool(len(img_l))
