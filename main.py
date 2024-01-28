@@ -14,7 +14,7 @@ class Image_Processing(threading.Thread):
     self.file = file
     self.output = output
     # set a default value
-    self.ret = []
+    self.ret = None
 
   def run(self):
     # Open image
