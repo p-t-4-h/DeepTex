@@ -75,11 +75,15 @@ def max_pool(matrice, k_size):
 
 
 def train(img_l, output=True):
-  for img in img_l:
-    t = Image_Processing(img, output)
-    t.start()
-    np_array = t.ret
+  threads = [Image_Processing(img, output) for img in img_l]
+  for thread in threads:
+    thread.start()
+    
+  for thread in threads:
+    thread.join()
 
+  for thread in threads:
+    np_array = thread.ret
     horizontal = np.array([[1, 1, 1], [0, 0, 0], [-1, -1, -1]])
     vertical = np.array([[-1, 0, 1], [-1, 0, 1], [-1, 0, 1]])
 
