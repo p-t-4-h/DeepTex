@@ -74,7 +74,7 @@ def max_pool(matrice, k_size):
                                                k_y).max(axis=(1, 3))
 
 
-def train(img_l, output=True):
+def start_processing(img_l, output=True):
   threads = [Image_Processing(img, output) for img in img_l]
   for thread in threads:
     thread.start()
@@ -91,10 +91,10 @@ def train(img_l, output=True):
     v = conv(np_array, vertical)
 
     data = Image.fromarray(h).convert("L")
-    data.save(f"./h_{img}")
+    data.save(f"./Outputs/h_{thread.file}")
 
     data = Image.fromarray(v).convert("L")
-    data.save(f"./v_{img}")
+    data.save(f"./Outputs/v_{thread.file}")
 
     #Pooling arrays
     k_size = (2, 2)
@@ -102,6 +102,8 @@ def train(img_l, output=True):
     v_p = max_pool(v, k_size)
 
     data = Image.fromarray(h_p).convert("L")
-    data.save(f"./h_p_{img}")
+    data.save(f"./Outputs/h_p_{thread.file}")
     data = Image.fromarray(v_p).convert("L")
-    data.save(f"./v_p_{img}")
+    data.save(f"./Outputs/v_p_{thread.file}")
+
+start_processing(["Numbers.png"])
