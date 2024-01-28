@@ -5,7 +5,8 @@ from tqdm import tqdm
 import threading
 
 #numpy.set_printoptions(threshold=sys.maxsize)
-
+horizontal = np.array([[1, 1, 1], [0, 0, 0], [-1, -1, -1]])
+vertical = np.array([[-1, 0, 1], [-1, 0, 1], [-1, 0, 1]])
 
 class Image_Processing(threading.Thread):
 
@@ -17,32 +18,28 @@ class Image_Processing(threading.Thread):
     self.ret = None
 
   def run(self):
-    # Open image
-    img = Image.open(f"./Images/{self.file}")
-    # Convert in Black and White
-    img = ImageOps.invert(img.convert('L'))
-    # Convert into NumPy array
-    np_d = np.array(img)
+    np_d = prepare(self.file, self.output)
+
+    #Convoluting arrays
+    h = conv(np_d, horizontal)
+    v = conv(np_d, vertical)
+
+    #Pooling arrays
+    k_size = (2, 2)
+    h_p = max_pool(h, k_size)
+    v_p = max_pool(v, k_size)
 
     if self.output:
-      # Create an output image
-      data = Image.fromarray(np_d)
-      # Save it
-      data.save(f"./Outputs/{self.file}")
+      data = Image.fromarray(h).convert("L")
+      data.save(f"./Outputs/h_{self.file}")
+      data = Image.fromarray(v).convert("L")
+      data.save(f"./Outputs/v_{self.file}")
+      data = Image.fromarray(h_p).convert("L")
+      data.save(f"./Outputs/h_p_{self.file}")
+      data = Image.fromarray(v_p).convert("L")
+      data.save(f"./Outputs/v_p_{self.file}")
 
-      # Reshape the array in 1D
-      #np_d_flat = np_d.reshape(-1)
-      np_d_flat = np.reshape(np_d, (1, np_d.size))
-
-      # Create an output image
-      data = Image.fromarray(np_d_flat)
-      # Save it
-      data.save(f"./Outputs/flat_{self.file}")
-
-      # Save the NumPy array in .npy file
-      #np.save("./Outputs/output.npy", np_d)
-
-    self.ret = np_d
+    self.ret = (h_p, v_p)
 
 
 def conv(Input, Filter):
@@ -63,6 +60,36 @@ def conv(Input, Filter):
 
   return convolved
 
+def prepare(file: str, output=False):
+  # Open image
+    img = Image.open(f"./Images/{file}")
+    # Convert in Black and White
+    img = ImageOps.invert(img.convert('L'))
+    # Convert into NumPy array
+    np_d = np.array(img)
+
+    if output:
+      # Create an output image
+      data = Image.fromarray(np_d)
+      # Save it
+      data.save(f"./Outputs/{file}")
+
+      # Reshape the array in 1D
+      #np_d_flat = np_d.reshape(-1)
+      np_d_flat = np.reshape(np_d, (1, np_d.size))
+
+      try:
+        # Create an output image
+        data = Image.fromarray(np_d_flat)
+        # Save it
+        data.save(f"./Outputs/flat_{file}")
+      except:
+        pass
+      
+      # Save the NumPy array in .npy file
+      #np.save("./Outputs/output.npy", np_d)
+
+    return np_d
 
 def max_pool(matrice, k_size):
   k_x, k_y = k_size
@@ -80,30 +107,6 @@ def start_processing(img_l, output=True):
     thread.start()
     
   for thread in threads:
-    thread.join()
+    thread.join()    
 
-  for thread in threads:
-    np_array = thread.ret
-    horizontal = np.array([[1, 1, 1], [0, 0, 0], [-1, -1, -1]])
-    vertical = np.array([[-1, 0, 1], [-1, 0, 1], [-1, 0, 1]])
-
-    h = conv(np_array, horizontal)
-    v = conv(np_array, vertical)
-
-    data = Image.fromarray(h).convert("L")
-    data.save(f"./Outputs/h_{thread.file}")
-
-    data = Image.fromarray(v).convert("L")
-    data.save(f"./Outputs/v_{thread.file}")
-
-    #Pooling arrays
-    k_size = (2, 2)
-    h_p = max_pool(h, k_size)
-    v_p = max_pool(v, k_size)
-
-    data = Image.fromarray(h_p).convert("L")
-    data.save(f"./Outputs/h_p_{thread.file}")
-    data = Image.fromarray(v_p).convert("L")
-    data.save(f"./Outputs/v_p_{thread.file}")
-
-start_processing(["Numbers.png"])
+start_processing(["Numbers.png", "Maths.jpg"], output=True)
