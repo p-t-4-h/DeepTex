@@ -68,12 +68,15 @@ def max_pool(matrice, k_size):
 def Process(file: str, output=True):
   np_d = prepare(file, output)
 
+  k_size = (2, 2)
+  np_d = max_pool(np_d, k_size)
+
   #Convoluting arrays
   h = conv(np_d, horizontal)
   v = conv(np_d, vertical)
 
   #Pooling arrays
-  k_size = (2, 2)
+  k_size = (4, 4)
   h_p = max_pool(h, k_size)
   v_p = max_pool(v, k_size)
 
