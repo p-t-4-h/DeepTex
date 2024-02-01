@@ -76,7 +76,7 @@ def Process(file: str, output=True):
   v = conv(np_d, vertical)
 
   #Pooling arrays
-  k_size = (4, 4)
+  k_size = (2, 2)
   h_p = max_pool(h, k_size)
   v_p = max_pool(v, k_size)
 
