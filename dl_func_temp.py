@@ -48,4 +48,11 @@ def predict(X, parametres):
     Af = activations['A' + str(C)]
     return Af >= 0.5
 
+
+def accuracy(TP, TN, FP, FN):
+    return (TP+TN)/(TP+TN+FP+FN)
+
+def precision(TP, FP):
+    return TP/(TP+FP)
+
 print(parametres)
