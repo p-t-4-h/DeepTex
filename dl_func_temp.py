@@ -32,17 +32,21 @@ def back_propagation(y,activations,parametres):
         gradients["dW"+str(c)]=1/m*np.dot(dZ, activations["A"+str(c-1)].T)
         gradients["dW"+str(c)]=1/m*np.sum(dZ,axis=1,keepdims=True)
         if c>1:
+            #descente de gradient = truc compliqué
             dZ = np.dot(parametres['W'+str(c)].T,dZ)*activations['A'+str(c-1)]*(1-activations['A'+str(c-1)])
     return gradients
     
 def update(gradients, parametres, learning_rate):
     C = len(parametres) // 2
     for c in range(1, C + 1):
+        #nouveaux poids = ancien poids - learning rate x descente de grad poids
         parametres['W'+str(c)]=parametres['W'+str(c)]-learning_rate*gradients['dW'+str(c)]
+        #nouveaux biais = ancien biais - learning rate x descente de grad biais
         parametres['b'+str(c)]=parametres['b'+str(c)]-learning_rate*gradients['db'+str(c)]
     return parametres
 
 def predict(X, parametres):
+    #tester le réseau
     activations = forward_propagation(X, parametres)
     C = len(parametres) // 2
     Af = activations['A' + str(C)]
